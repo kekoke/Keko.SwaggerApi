@@ -13,6 +13,10 @@ using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
 using Microsoft.AspNetCore.Http;
+using Keko.SwaggerApi.Web.Swagger;
+using Keko.SwaggerApi.Web.Swagger.Filter;
+using Microsoft.Extensions.Configuration;
+using Keko.SwaggerApi.Web.Utils;
 
 namespace Keko.SwaggerApi.Web.Startup
 {
@@ -21,6 +25,7 @@ namespace Keko.SwaggerApi.Web.Startup
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddSingleton<IConfigurationRoot, ConfigurationRoot>();
 
             //Configure DbContext
             services.AddAbpDbContext<SwaggerApiDbContext>(options =>
@@ -34,18 +39,25 @@ namespace Keko.SwaggerApi.Web.Startup
 
             services.AddSwaggerGen(options =>
             {
-                options.SwaggerDoc("v1", new OpenApiInfo { Title = "AbpZeroTemplate API", Version = "v1" });
+                SwaggerDocumentBuilder.OpenApiInfos.ForEach(info =>
+                {
+                    options.SwaggerDoc(info.Version, new OpenApiInfo { Title = info.Title, Version = info.Version, Description = info.Description });
+                });
+                //options.SwaggerDoc("v1", new OpenApiInfo { Title = "AbpZeroTemplate API", Version = "v1" });
+                //options.SwaggerDoc("v2", new OpenApiInfo { Title = "AbpZeroTemplate API", Version = "v2" });
+                options.DocumentFilter<ApiFilter>();
                 options.DocInclusionPredicate((docName, description) => true);
             });
 
             //添加 MiniProfiler
-            services.AddMiniProfiler(options => {
+            services.AddMiniProfiler(options =>
+            {
                 // ALL of this is optional. You can simply call .AddMiniProfiler() for all defaults
                 // Defaults: In-Memory for 30 minutes, everything profiled, every user can see
 
                 // Path to use for profiler URLs, default is /mini-profiler-resources
                 options.RouteBasePath = "/profiler";
-              
+
                 // Control which SQL formatter to use, InlineFormatter is the default
                 options.SqlFormatter = new StackExchange.Profiling.SqlFormatters.SqlServerFormatter();
 
@@ -60,7 +72,7 @@ namespace Keko.SwaggerApi.Web.Startup
                 options.IgnoredPaths.Add("/js");
             }).AddEntityFramework();
 
-          
+
 
             //Configure Abp and Dependency Injection
             return services.AddAbp<SwaggerApiWebModule>(options =>
@@ -74,6 +86,8 @@ namespace Keko.SwaggerApi.Web.Startup
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
         {
+            ServiceLocator.Instance = app.ApplicationServices;
+
             app.UseAbp(); //Initializes ABP framework.
 
             if (env.IsDevelopment())
@@ -87,22 +101,28 @@ namespace Keko.SwaggerApi.Web.Startup
             {
                 app.UseExceptionHandler("/Error");
             }
-         
+
 
             app.UseStaticFiles();
 
-          
+
 
             app.UseSwagger();
             //Enable middleware to serve swagger - ui assets(HTML, JS, CSS etc.)
             app.UseSwaggerUI(options =>
             {
-                options.SwaggerEndpoint("/swagger/v1/swagger.json", "AbpZeroTemplate API V1");
+                SwaggerDocumentBuilder.OpenApiInfos.ForEach(info =>
+                {
+                    options.SwaggerEndpoint($"/swagger/{info.Version}/swagger.json", info.Title);
+                });
+
+                //options.SwaggerEndpoint("/swagger/v1/swagger.json", "AbpZeroTemplate API V1");
+                //options.SwaggerEndpoint("/swagger/v2/swagger.json", "AbpZeroTemplate API V2");
                 options.IndexStream = () => GetType().GetTypeInfo().Assembly.GetManifestResourceStream($"{this.GetType().Assembly.GetName().Name}.index.html");
                 options.RoutePrefix = string.Empty;
             }); //URL: /swagger 
 
-      
+
 
             app.UseRouting();
 

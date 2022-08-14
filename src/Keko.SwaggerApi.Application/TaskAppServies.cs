@@ -12,12 +12,12 @@ using System.Threading.Tasks;
 
 namespace Keko.SwaggerApi
 {
-    [ApiDescriptionSettings(GroupName = "todo", Group = "代办服务", Order = 999)]
-    public class TodoAppService : SwaggerApiAppServiceBase
+    [ApiDescriptionSettings(GroupName = "task", Group = "任务服务", Order = 9)]
+    public class TaskAppServies : SwaggerApiAppServiceBase
     {
         private readonly IRepository<TodoItem, int> _todoItemRepository;
 
-        public TodoAppService(IRepository<TodoItem, int> todoItemRepository)
+        public TaskAppServies(IRepository<TodoItem, int> todoItemRepository)
         {
             _todoItemRepository = todoItemRepository;
         }
@@ -31,24 +31,6 @@ namespace Keko.SwaggerApi
                     Id = item.Id,
                     Text = item.Text
                 }).ToListAsync();
-        }
-
-        public async Task<TodoItemDto> CreateAsync(CreateTodoItemInput input)
-        {
-            var todoItem = await _todoItemRepository.InsertAsync(
-                new TodoItem { Id = int.Parse(DateTime.Now.ToString("HHmmdd")), Text = input.Text, CreationTime = DateTime.Now }
-            );
-
-            return new TodoItemDto
-            {
-                Id = todoItem.Id,
-                Text = todoItem.Text
-            };
-        }
-
-        public async Task DeleteAsync(int id)
-        {
-            await _todoItemRepository.DeleteAsync(id);
         }
     }
 }

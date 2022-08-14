@@ -12,10 +12,12 @@
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Keko.SwaggerApi.Common\Keko.SwaggerApi.Common.csproj" />
     <ProjectReference Include="..\Keko.SwaggerApi.Core\Keko.SwaggerApi.Core.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Abp.EntityFrameworkCore" Version="5.13.0" />
     <PackageReference Include="Abp.AutoMapper" Version="5.13.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.0" />
   </ItemGroup>
 </Project>
