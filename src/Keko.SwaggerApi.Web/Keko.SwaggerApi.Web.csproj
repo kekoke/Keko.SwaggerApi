@@ -35,6 +35,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Keko.SwaggerApi.Application\Keko.SwaggerApi.Application.csproj" />
+    <ProjectReference Include="..\Keko.SwaggerApi.Common\Keko.SwaggerApi.Common.csproj" />
     <ProjectReference Include="..\Keko.SwaggerApi.EntityFrameworkCore\Keko.SwaggerApi.EntityFrameworkCore.csproj" />
   </ItemGroup>
   <ItemGroup>

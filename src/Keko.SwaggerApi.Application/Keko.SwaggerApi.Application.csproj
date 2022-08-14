@@ -13,6 +13,7 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Keko.SwaggerApi.Common\Keko.SwaggerApi.Common.csproj" />
+    <ProjectReference Include="..\Keko.SwaggerApi.Common\Keko.SwaggerApi.Common.csproj" />
     <ProjectReference Include="..\Keko.SwaggerApi.Core\Keko.SwaggerApi.Core.csproj" />
   </ItemGroup>
   <ItemGroup>
